@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>군포 AI 실전 생산성 클래스 | 야근 탈출 & 매출 증대</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #fdfcf9; color: #333; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 320px; max-height: 400px; }
+        .tab-active { border-bottom: 4px solid #4f46e5; color: #4f46e5; font-weight: 800; }
+        .glass-morphism { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .transition-all-custom { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <nav class="fixed top-0 w-full z-50 glass-morphism py-4 px-6 flex justify-between items-center shadow-sm">
+        <div class="text-indigo-700 font-extrabold text-xl flex items-center gap-2">
+            <span>군포 AI 생산성 Lab</span>
+        </div>
+        <div class="hidden md:flex space-x-8 text-sm font-semibold items-center">
+            <a href="#persona" class="hover:text-indigo-600">대상자 찾기</a>
+            <a href="#impact" class="hover:text-indigo-600">효과 확인</a>
+            <a href="#curriculum" class="hover:text-indigo-600">강의 내용</a>
+            <a href="#apply" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition">지금 신청하기</a>
+            <button onclick="openAdminGate()" class="text-xs bg-gray-100 text-gray-500 hover:text-indigo-600 py-1 px-3 rounded-md border border-gray-200">관리자 모드</button>
+        </div>
+        <!-- Mobile admin trigger -->
+        <div class="md:hidden flex items-center">
+            <button onclick="openAdminGate()" class="text-xs bg-gray-100 text-gray-500 py-1 px-3 rounded-md border border-gray-200">관리자</button>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 px-6 text-center max-w-4xl mx-auto">
+        <span class="inline-block px-4 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold mb-4">군포/산본/금정 지역 특화 실전 강의</span>
+        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+            야근은 <span class="text-indigo-600 underline">AI</span>에게 맡기고,<br> 당신은 <span class="text-indigo-600">칼퇴</span>하세요.
+        </h1>
+        <p class="text-lg text-gray-600 mb-10">
+            기획서 작성 2시간이 5분으로 줄어드는 기적, <br class="hidden md:block">
+            군포 소상공인과 직장인을 위한 100% 실전형 AI 업무 자동화 클래스.
+        </p>
+        <div class="flex flex-col md:flex-row justify-center gap-4">
+            <a href="#apply" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:-translate-y-1 transition-all-custom">수강 신청하기 (선착순 마감)</a>
+            <a href="#curriculum" class="bg-white border-2 border-indigo-600 text-indigo-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all-custom">커리큘럼 자세히 보기</a>
+        </div>
+    </header>
+
+    <section id="persona" class="py-20 bg-gray-50 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">어떤 고민을 하고 계신가요?</h2>
+                <p class="text-gray-500 italic">당신과 가장 비슷한 상황을 클릭해보세요.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <button onclick="updatePersona('worker')" id="btn-worker" class="persona-btn bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-indigo-300 text-left transition-all-custom active-persona">
+                    <div class="text-4xl mb-4">🏢</div>
+                    <h3 class="text-xl font-bold mb-2">군포 직장인</h3>
+                    <p class="text-gray-500 text-sm">보고서, 엑셀, 이메일 더미에 파묻혀 야근이 일상인 실무자</p>
+                </button>
+                <button onclick="updatePersona('owner')" id="btn-owner" class="persona-btn bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-indigo-300 text-left transition-all-custom">
+                    <div class="text-4xl mb-4">🍱</div>
+                    <h3 class="text-xl font-bold mb-2">지역 사장님</h3>
+                    <p class="text-gray-500 text-sm">홍보 문구 하나 쓰기도 막막하고 마케팅 비용이 부담되는 소상공인</p>
+                </button>
+                <button onclick="updatePersona('freelancer')" id="btn-freelancer" class="persona-btn bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-indigo-300 text-left transition-all-custom">
+                    <div class="text-4xl mb-4">💻</div>
+                    <h3 class="text-xl font-bold mb-2">1인 기업가</h3>
+                    <p class="text-gray-500 text-sm">기획부터 정산까지 혼자 다 하느라 몸이 열 개라도 부족한 프리랜서</p>
+                </button>
+            </div>
+
+            <div id="persona-content" class="bg-indigo-900 text-white p-8 md:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-10">
+                <div class="flex-1">
+                    <h4 id="persona-title" class="text-2xl font-bold mb-4 text-indigo-300">"보고서 쓰다가 하루가 다 가요..."</h4>
+                    <p id="persona-desc" class="text-lg leading-relaxed opacity-90 mb-6">
+                        반복되는 데이터 정리와 문서 작성 때문에 핵심적인 기획 업무에 집중할 시간이 없으시죠? AI를 통해 보고서 초안을 1분 만에 완성하고 데이터 분석을 자동화하는 방법을 알려드립니다.
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-semibold">ChatGPT</span>
+                        <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-semibold">Claude</span>
+                        <span class="px-3 py-1 bg-white/10 rounded-lg text-xs font-semibold">Microsoft Copilot</span>
+                    </div>
+                </div>
+                <div class="flex-1 bg-white/5 p-6 rounded-2xl w-full">
+                    <div class="text-sm font-bold text-indigo-400 mb-4 uppercase tracking-widest">강의 수강 후 변화</div>
+                    <ul id="persona-benefits" class="space-y-4">
+                        <li class="flex items-center gap-3">
+                            <span class="text-green-400">✔</span> <span>2시간 걸리던 제안서 초안 5분 컷</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="text-green-400">✔</span> <span>복잡한 엑셀 수식 대화로 해결</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="text-green-400">✔</span> <span>이메일 및 자료 요약 자동화</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="impact" class="py-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-6">AI와 함께하면 시간이 얼마나 남을까요?</h2>
+            <p class="text-gray-600 mb-10">주요 업무 소요 시간 비교 (단위: 분)</p>
+            
+            <div class="chart-container mb-12">
+                <canvas id="impactChart"></canvas>
+            </div>
+            
+            <div class="bg-indigo-50 p-6 rounded-2xl inline-block border border-indigo-100">
+                <p class="text-indigo-800 font-bold">
+                    💡 일주일 기준 평균 <span class="text-2xl text-indigo-600">12시간</span> 이상의 자유 시간을 확보할 수 있습니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="curriculum" class="py-20 bg-gray-50 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">단 3일로 끝내는 AI 마스터 커리큘럼</h2>
+                <p class="text-gray-500">지루한 이론은 뺍니다. 내일 바로 쓰는 실전 도구만 배웁니다.</p>
+            </div>
+
+            <div class="flex border-b border-gray-200 mb-10 justify-center">
+                <button onclick="showStep(1)" id="tab-1" class="tab-btn px-6 py-4 text-lg tab-active">Step 1. 기초</button>
+                <button onclick="showStep(2)" id="tab-2" class="tab-btn px-6 py-4 text-lg">Step 2. 심화</button>
+                <button onclick="showStep(3)" id="tab-3" class="tab-btn px-6 py-4 text-lg">Step 3. 자동화</button>
+            </div>
+
+            <div id="step-content" class="bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-gray-100 mb-12">
+                <!-- Step content injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <section id="apply" class="py-24 px-6 text-center bg-indigo-600 text-white overflow-hidden relative">
+        <div class="relative z-10 max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold mb-6">이제 군포에서 AI를 만날 차례입니다.</h2>
+            <p class="text-xl mb-12 opacity-90 max-w-2xl mx-auto">
+                산본역 스터디룸 / 금정 지식산업센터 등 접근성 좋은 장소에서 오프라인 밀착 코칭으로 진행됩니다. (노트북 지참 필수)
+            </p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+                <!-- Lecture Info -->
+                <div class="lg:col-span-5 text-left bg-indigo-800/50 p-8 rounded-3xl border border-indigo-500/30 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-indigo-200">모집 요강</h3>
+                        <div class="space-y-4">
+                            <div class="flex flex-col border-b border-indigo-500/30 pb-3">
+                                <span class="text-xs text-indigo-300 font-semibold">강의 일정</span>
+                                <span class="text-lg font-bold">매주 토요일 (총 3회 패키지)</span>
+                            </div>
+                            <div class="flex flex-col border-b border-indigo-500/30 pb-3">
+                                <span class="text-xs text-indigo-300 font-semibold">강의 장소</span>
+                                <span class="text-lg font-bold">산본 로데오거리 인근 전문 스터디룸</span>
+                            </div>
+                            <div class="flex flex-col pb-3">
+                                <span class="text-xs text-indigo-300 font-semibold">모집 정원</span>
+                                <span class="text-lg font-bold text-amber-300">선착순 10명 이내 (개별 코칭 집중)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-indigo-500/30">
+                        <p class="text-sm opacity-80 italic">"개인 업무용 소스를 가져오시면 당일 즉시 AI 템플릿과 자동화 세팅을 함께 만듭니다."</p>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="lg:col-span-7 bg-white text-gray-900 p-8 rounded-3xl shadow-2xl text-left">
+                    <h3 class="text-2xl font-bold mb-6 text-indigo-900">간편 수강 신청</h3>
+                    
+                    <form id="applyForm" onsubmit="submitApplication(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">성함 *</label>
+                            <input type="text" id="form-name" required placeholder="홍길동" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">연락처 *</label>
+                            <input type="tel" id="form-phone" required placeholder="010-1234-5678" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">본인의 직업 상태 *</label>
+                                <select id="form-persona" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                    <option value="worker">회사 직장인 / 사무직</option>
+                                    <option value="owner">지역 자영업자 / 소상공인</option>
+                                    <option value="freelancer">1인 기업가 / 프리랜서</option>
+                                    <option value="etc">일반 주민 / 기타</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">원하는 학습 단계 *</label>
+                                <select id="form-step" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                    <option value="all">전체 과정 (Step 1 ~ 3 패키지)</option>
+                                    <option value="step1">Step 1. 기초 다지기</option>
+                                    <option value="step2">Step 2. 기획/디자인 비주얼 AI</option>
+                                    <option value="step3">Step 3. 비서 만들기 & 자동화</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">AI 강의를 통해 해결하고 싶은 나만의 업무/고민</label>
+                            <textarea id="form-memo" rows="3" placeholder="예: 가게 인스타 홍보글 쓰는 데 시간이 너무 걸려요, 엑셀 정리를 자동화하고 싶어요 등" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                        </div>
+
+                        <div class="flex items-start gap-2 pt-2">
+                            <input type="checkbox" id="form-agree" required class="mt-1 accent-indigo-600 h-4 w-4">
+                            <label for="form-agree" class="text-xs text-gray-500 leading-tight">
+                                개인정보 수집 및 안내 문자 전송 수신에 동의합니다. (작성해주신 정보는 수강 신청 조율을 위해서만 사용됩니다.)
+                            </label>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full mt-6 bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg flex justify-center items-center gap-2">
+                            <span>신청 완료하기</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <p class="text-sm opacity-70 italic mt-12">"기업, 기관 출강 문의는 카카오톡 채널 혹은 상단 관리자 문의를 이용해 주세요."</p>
+        </div>
+    </section>
+
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-indigo-950 text-white px-6 py-4 rounded-2xl shadow-2xl border border-indigo-500 flex items-center gap-3">
+            <span id="toast-icon" class="text-green-400 text-xl">✔</span>
+            <span id="toast-msg" class="text-sm font-semibold">성공적으로 처리되었습니다.</span>
+        </div>
+    </div>
+
+    <div id="admin-gate-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">관리자 인증</h3>
+            <p class="text-sm text-gray-500 mb-6">수강 신청자 명단을 보려면 비밀번호를 입력하세요.</p>
+            
+            <div class="space-y-4">
+                <input type="password" id="admin-password" placeholder="비밀번호 입력 (기본: 1234)" class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center font-bold tracking-widest">
+                <div class="flex gap-2">
+                    <button onclick="closeAdminGate()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition">취소</button>
+                    <button onclick="verifyAdminPassword()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition">로그인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-dashboard-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden overflow-y-auto p-4 md:p-10">
+        <div class="bg-white rounded-3xl max-w-6xl mx-auto my-8 shadow-2xl border border-gray-200 overflow-hidden flex flex-col min-h-[80vh]">
+            <!-- Header -->
+            <div class="bg-indigo-900 text-white px-8 py-6 flex justify-between items-center flex-wrap gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold flex items-center gap-2">
+                        <span>📊</span> 군포 AI 생산성 Lab 수강 신청자 관리 명단
+                    </h2>
+                    <p class="text-indigo-200 text-xs mt-1">실시간으로 접수되는 데이터를 조회하고 관리할 수 있습니다.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportToClipboard()" class="bg-indigo-800 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-4 rounded-xl border border-indigo-600 transition">
+                        📋 텍스트로 전체 복사
+                    </button>
+                    <button onclick="closeAdminDashboard()" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-xl transition text-sm">
+                        대시보드 닫기
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="p-8 border-b bg-gray-50 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase">총 신청 인원</div>
+                    <div id="stat-total" class="text-2xl font-black text-indigo-600 mt-1">0명</div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase">직장인 비율</div>
+                    <div id="stat-worker" class="text-2xl font-black text-emerald-600 mt-1">0%</div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase">소상공인 비율</div>
+                    <div id="stat-owner" class="text-2xl font-black text-amber-600 mt-1">0%</div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
+                    <div class="text-xs text-gray-400 font-bold uppercase">전체패키지 선호</div>
+                    <div id="stat-package" class="text-2xl font-black text-purple-600 mt-1">0명</div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 p-8 overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[800px]">
+                    <thead>
+                        <tr class="border-b border-gray-100 text-gray-400 text-xs font-extrabold uppercase">
+                            <th class="pb-4">신청 시간</th>
+                            <th class="pb-4">성함</th>
+                            <th class="pb-4">연락처</th>
+                            <th class="pb-4">구분</th>
+                            <th class="pb-4">신청 강의</th>
+                            <th class="pb-4">나만의 해결 니즈 (고민)</th>
+                            <th class="pb-4 text-right">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body" class="text-sm divide-y divide-gray-100 text-gray-700">
+                        <!-- Loaded dynamically via JS -->
+                        <tr>
+                            <td colspan="7" class="py-10 text-center text-gray-400 italic">
+                                신청자가 데이터를 로딩하는 중이거나 비어있습니다.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-12 text-center text-gray-400 text-xs border-t bg-gray-50 px-6">
+        <p class="font-semibold text-gray-600">© 2026 군포 AI 생산성 연구소. All Rights Reserved.</p>
+        <p class="mt-2">경기도 군포시 산본동 일대 강의실 운영 & 비즈니스 코칭 특화</p>
+        <div class="mt-6 flex justify-center gap-4">
+            <button onclick="openAdminGate()" class="text-xs text-indigo-500 hover:underline">관리자 모드 접속</button>
+            <span class="text-gray-300">|</span>
+            <a href="#curriculum" class="text-xs text-gray-400 hover:underline">교육 커리큘럼</a>
+        </div>
+    </footer>
+
+    <script type="module">
+        // Firebase Core & Firestore SDK Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment Variables Provided by Platform
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'gunpo-ai-lecture-v2';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "",
+            authDomain: "mock-project.firebaseapp.com",
+            projectId: "mock-project",
+            storageBucket: "mock-project.appspot.com",
+            messagingSenderId: "00000000",
+            appId: "1:000000:web:0000"
+        };
+        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize App
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global variables for caching database subscribers
+        let applicantsList = [];
+        let unsubscribeApplicants = null;
+
+        async function authenticateUser() {
+            try {
+                if (authToken) {
+                    await signInWithCustomToken(auth, authToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                console.log("Authentication complete. Initiating Firestore listeners...");
+                startRealtimeSync();
+            } catch (err) {
+                console.error("Firebase authentication error:", err);
+            }
+        }
+
+        // Initialize Firestore Sync (RULE 1 & 2 Applied)
+        function startRealtimeSync() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            // Strict Path: /artifacts/{appId}/public/data/{collectionName}
+            const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'applicants');
+
+            // Listeners with mandatory error callbacks
+            unsubscribeApplicants = onSnapshot(collectionRef, (snapshot) => {
+                applicantsList = [];
+                snapshot.forEach((doc) => {
+                    applicantsList.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort array in memory to avoid complex query with orderBy (RULE 2)
+                applicantsList.sort((a, b) => b.createdAt - a.createdAt);
+
+                // Update UI views
+                renderAdminDashboard();
+            }, (error) => {
+                console.error("Firestore database sync error:", error);
+            });
+        }
+
+        // Add application to Firestore (RULE 3 - Auth check inside action)
+        async function saveApplication(data) {
+            const user = auth.currentUser;
+            if (!user) {
+                showToast("🔴 서버 연결 중입니다. 잠시 후 다시 시도해 주세요.", "error");
+                return false;
+            }
+
+            try {
+                const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'applicants');
+                await addDoc(collectionRef, {
+                    ...data,
+                    userId: user.uid,
+                    createdAt: Date.now()
+                });
+                return true;
+            } catch (err) {
+                console.error("Error saving data to Firestore:", err);
+                showToast("🔴 신청 저장에 실패했습니다. 관리자에게 문의바랍니다.", "error");
+                return false;
+            }
+        }
+
+        // Delete application (Firestore helper)
+        async function deleteApplicantFromDb(docId) {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'applicants', docId);
+                await deleteDoc(docRef);
+                showToast("선택된 수강 신청 기록이 정상적으로 삭제되었습니다.", "success");
+            } catch (err) {
+                console.error("Failed to delete record:", err);
+            }
+        }
+
+        // Export data directly for copying to clipboard (Fallback helper)
+        window.exportToClipboard = function() {
+            if (applicantsList.length === 0) {
+                showToast("내보낼 신청 데이터가 존재하지 않습니다.", "error");
+                return;
+            }
+
+            let textData = "군포 AI 생산성 클래스 신청 명단\n=============================\n";
+            applicantsList.forEach((a, i) => {
+                const date = new Date(a.createdAt).toLocaleString('ko-KR');
+                const personaName = a.persona === 'worker' ? '직장인' : (a.persona === 'owner' ? '자영업자' : (a.persona === 'freelancer' ? '1인기업가' : '기타'));
+                const stepName = a.step === 'all' ? '전체과정' : (a.step === 'step1' ? '1단계' : (a.step === 'step2' ? '2단계' : '3단계'));
+                
+                textData += `[${i+1}] 신청일: ${date} / 성함: ${a.name} / 연락처: ${a.phone} / 대상군: ${personaName} / 신청단계: ${stepName} / 메모: ${a.memo || '없음'}\n`;
+            });
+
+            // Fallback for copy command in iframe environment
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textData;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            showToast("📋 전체 명단 데이터가 클립보드에 깔끔하게 복사되었습니다.");
+        };
+
+        // UI rendering functions
+        function renderAdminDashboard() {
+            const tableBody = document.getElementById('admin-table-body');
+            const totalStat = document.getElementById('stat-total');
+            const workerStat = document.getElementById('stat-worker');
+            const ownerStat = document.getElementById('stat-owner');
+            const packageStat = document.getElementById('stat-package');
+
+            if (applicantsList.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-10 text-center text-gray-400 italic">
+                            현재 수강 신청자가 없습니다. 마케팅을 시작하여 첫 수강생을 모집해 보세요!
+                        </td>
+                    </tr>
+                `;
+                totalStat.innerText = "0명";
+                workerStat.innerText = "0%";
+                ownerStat.innerText = "0%";
+                packageStat.innerText = "0명";
+                return;
+            }
+
+            // Stats calculations in Javascript Memory
+            const totalCount = applicantsList.length;
+            const workerCount = applicantsList.filter(a => a.persona === 'worker').length;
+            const ownerCount = applicantsList.filter(a => a.persona === 'owner').length;
+            const packageCount = applicantsList.filter(a => a.step === 'all').length;
+
+            totalStat.innerText = `${totalCount}명`;
+            workerStat.innerText = `${Math.round((workerCount / totalCount) * 100)}%`;
+            ownerStat.innerText = `${Math.round((ownerCount / totalCount) * 100)}%`;
+            packageStat.innerText = `${packageCount}명`;
+
+            // Table Body HTML injection
+            tableBody.innerHTML = applicantsList.map(a => {
+                const date = new Date(a.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                let personaBadge = '';
+                if(a.persona === 'worker') personaBadge = `<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">🏢 직장인</span>`;
+                else if(a.persona === 'owner') personaBadge = `<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold">🍱 소상공인</span>`;
+                else if(a.persona === 'freelancer') personaBadge = `<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">💻 프리랜서</span>`;
+                else personaBadge = `<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-bold">기타</span>`;
+
+                let stepBadge = '';
+                if(a.step === 'all') stepBadge = `<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-extrabold">전체 패키지</span>`;
+                else if(a.step === 'step1') stepBadge = `<span class="text-xs">Step 1. 기초</span>`;
+                else if(a.step === 'step2') stepBadge = `<span class="text-xs">Step 2. 심화</span>`;
+                else stepBadge = `<span class="text-xs">Step 3. 자동화</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 text-xs text-gray-400 font-semibold">${date}</td>
+                        <td class="py-4 font-extrabold text-slate-900">${escapeHtml(a.name)}</td>
+                        <td class="py-4 font-semibold text-slate-700">${escapeHtml(a.phone)}</td>
+                        <td class="py-4">${personaBadge}</td>
+                        <td class="py-4 font-medium text-slate-800">${stepBadge}</td>
+                        <td class="py-4 text-xs text-slate-500 max-w-xs truncate" title="${escapeHtml(a.memo || '')}">${escapeHtml(a.memo || '-')}</td>
+                        <td class="py-4 text-right">
+                            <button onclick="triggerDeleteRecord('${a.id}')" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 py-1 px-3 rounded-lg font-bold transition">삭제</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Trigger action mapping to global scope for module access
+        window.submitApplication = async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "<span>정보를 안전하게 전달 중...</span>";
+
+            const name = document.getElementById('form-name').value.trim();
+            const phone = document.getElementById('form-phone').value.trim();
+            const persona = document.getElementById('form-persona').value;
+            const step = document.getElementById('form-step').value;
+            const memo = document.getElementById('form-memo').value.trim();
+
+            const appData = { name, phone, persona, step, memo };
+            const success = await saveApplication(appData);
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+
+            if (success) {
+                // Clear Form
+                document.getElementById('applyForm').reset();
+                showToast("✨ 신청이 완료되었습니다! 24시간 내 문자 상담 드리겠습니다.");
+            }
+        };
+
+        window.triggerDeleteRecord = function(docId) {
+            if(confirm("정말로 이 신청 기록을 영구 삭제하시겠습니까? 복구할 수 없습니다.")) {
+                deleteApplicantFromDb(docId);
+            }
+        };
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // On window load sequence
+        window.addEventListener('load', () => {
+            authenticateUser();
+        });
+    </script>
+
+    <script>
+        // Data for interactive page rendering
+        const personas = {
+            worker: {
+                title: `"기획서 쓰다가 하루가 다 가요..."`,
+                desc: "반복되는 데이터 정리와 문서 작성 때문에 핵심적인 기획 업무에 집중할 시간이 없으시죠? AI를 통해 보고서 초안을 1분 만에 완성하고 데이터 분석을 자동화하는 방법을 알려드립니다.",
+                benefits: ["2시간 걸리던 제안서 초안 5분 컷", "복잡한 엑셀 수식 대화로 해결", "이메일 및 자료 요약 자동화"],
+                chartData: [120, 10, 60, 5, 90, 15]
+            },
+            owner: {
+                title: `"인스타 홍보 글 하나 쓰기가 너무 힘들어요."`,
+                desc: "매일 업로드할 사진 캡션과 홍보 문구 고민에 밤잠 설치시나요? AI가 당신의 가게 분위기에 맞는 감성적인 문구와 디자인 배너를 단 몇 초 만에 제작해 드립니다.",
+                benefits: ["카드뉴스 대본 3분 만에 추출", "고객 리뷰 자동 답글 시스템", "매장 홍보 영상 숏폼 자동 제작"],
+                chartData: [180, 20, 120, 15, 60, 10]
+            },
+            freelancer: {
+                title: `"혼자서 10인분의 일을 해야 해요."`,
+                desc: "기획, 마케팅, CS, 정산... 혼자 모든 것을 해결해야 하는 프리랜서에게 AI는 최고의 전용 인턴입니다. 당신만의 전용 GPTs 비서를 만들어 업무 효율을 극대화하세요.",
+                benefits: ["나만의 업무 매뉴얼 학습 AI 제작", "계약서 및 법률 문서 초안 검토", "단순 반복 작업 자동화 연동"],
+                chartData: [150, 15, 100, 10, 80, 20]
+            }
+        };
+
+        const steps = {
+            1: {
+                title: "AI와 대화하는 법 & 기초 도구 마스터",
+                items: [
+                    { t: "질문의 기술", d: "원하는 결과를 한 번에 얻는 프롬프트 엔지니어링 기초" },
+                    { t: "글쓰기 자동화", d: "블로그, 이메일, 제안서 초안 10배 빨리 작성하기" },
+                    { t: "자료 요약", d: "수십 장의 PDF를 10초 만에 핵심 요약하기" }
+                ],
+                tool: "ChatGPT, Claude"
+            },
+            2: {
+                title: "기획/디자인/영상 비주얼 AI 활용",
+                items: [
+                    { t: "Gamma 활용", d: "텍스트만으로 발표 PPT 5분 만에 완성하기" },
+                    { t: "Canva/Design", d: "디자인 초보도 가능한 고품질 홍보 배너 제작" },
+                    { t: "Vrew 숏폼", d: "글자만 치면 목소리와 영상이 나오는 AI 영상 제작" }
+                ],
+                tool: "Gamma, Canva, Vrew"
+            },
+            3: {
+                title: "반복 업무 제로, 나만의 AI 비서 만들기",
+                items: [
+                    { t: "Custom GPTs", d: "내 자료를 학습시켜 나만의 맞춤형 조수 만들기" },
+                    { t: "AI + Excel", d: "대화로 해결하는 데이터 정렬 및 분석 자동화" },
+                    { t: "워크플로우", d: "간단한 자동화 툴을 이용한 업무 시스템 구축" }
+                ],
+                tool: "GPTs, Zapier, Notion AI"
+            }
+        };
+
+        let currentChart;
+
+        // Initialize Chart.js
+        function initChart(data) {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            
+            if(currentChart) currentChart.destroy();
+            
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['문서 작성', 'AI 문서 작성', '마케팅 기획', 'AI 마케팅 기획', '데이터 분석', 'AI 데이터 분석'],
+                    datasets: [{
+                        label: '소요 시간 (분)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(156, 163, 175, 0.5)', '#4f46e5', 
+                            'rgba(156, 163, 175, 0.5)', '#4f46e5', 
+                            'rgba(156, 163, 175, 0.5)', '#4f46e5'
+                        ],
+                        borderRadius: 8,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            padding: 12,
+                            backgroundColor: '#1e1b4b',
+                            titleFont: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Update Persona View
+        function updatePersona(type) {
+            const p = personas[type];
+            document.getElementById('persona-title').innerText = p.title;
+            document.getElementById('persona-desc').innerText = p.desc;
+            
+            const benefitsList = document.getElementById('persona-benefits');
+            benefitsList.innerHTML = p.benefits.map(b => `
+                <li class="flex items-center gap-3">
+                    <span class="text-green-400">✔</span> <span>${b}</span>
+                </li>
+            `).join('');
+
+            document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('border-indigo-600', 'bg-indigo-50'));
+            document.getElementById(`btn-${type}`).classList.add('border-indigo-600', 'bg-indigo-50');
+
+            initChart(p.chartData);
+        }
+
+        // Show step curriculum dynamically
+        function showStep(stepNum) {
+            const s = steps[stepNum];
+            const content = document.getElementById('step-content');
+            
+            content.innerHTML = `
+                <div class="flex flex-col md:flex-row gap-10 items-start">
+                    <div class="flex-1">
+                        <div class="text-indigo-600 font-extrabold text-sm mb-2 uppercase tracking-tighter">Step 0${stepNum}</div>
+                        <h3 class="text-2xl font-bold mb-6">${s.title}</h3>
+                        <div class="space-y-6">
+                            ${s.items.map(i => `
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-lg mb-1">• ${i.t}</h4>
+                                    <p class="text-gray-600 pl-4 border-l-2 border-gray-100">${i.d}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="w-full md:w-64 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                        <div class="text-xs font-bold text-gray-400 mb-4 uppercase">주요 마스터 도구</div>
+                        <div class="flex flex-wrap gap-2">
+                            ${s.tool.split(', ').map(t => `<span class="bg-white px-3 py-1 rounded-full border text-sm shadow-sm">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById(`tab-${stepNum}`).classList.add('tab-active');
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = message;
+            toastIcon.innerText = type === "success" ? "✔" : "🔴";
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        function openAdminGate() {
+            document.getElementById('admin-gate-modal').classList.remove('hidden');
+            document.getElementById('admin-password').focus();
+        }
+
+        function closeAdminGate() {
+            document.getElementById('admin-gate-modal').classList.add('hidden');
+            document.getElementById('admin-password').value = '';
+        }
+
+        function verifyAdminPassword() {
+            const passwordInput = document.getElementById('admin-password').value;
+            // Admin password verification (using a simple prototype passcode '1234')
+            if (passwordInput === '1234') {
+                closeAdminGate();
+                showAdminDashboard();
+                showToast("🔐 관리자 계정 확인 성공. 데이터 조회를 환영합니다!");
+            } else {
+                showToast("비밀번호가 일치하지 않습니다.", "error");
+            }
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // block page scroll
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; // allow page scroll
+        }
+
+        // Initialize UI Elements
+        window.addEventListener('DOMContentLoaded', () => {
+            updatePersona('worker');
+            showStep(1);
+        });
+    </script>
+</body>
+</html>
